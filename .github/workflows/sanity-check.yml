@@ -1,0 +1,75 @@
+name: Sanity check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node-example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run Node example and assert on data.mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+          node examples/altinn-migration.mjs > /tmp/out.json
+          test -s /tmp/out.json
+          jq -e '.data.mappings | length > 0' /tmp/out.json
+
+  python-example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run Python example and assert on data.mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+          python examples/altinn-migration.py > /tmp/out.json
+          test -s /tmp/out.json
+          python -c "import json; d=json.load(open('/tmp/out.json')); m=d.get('data',{}).get('mappings'); assert m, 'missing or empty data.mappings'; assert hasattr(m, '__len__') and len(m) > 0, 'empty mappings'"
+
+  assertion-positive-control:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify assertions are not no-ops (must exit non-zero on bad host)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Node example must exit non-zero on a known-404 URL.
+          if APIER_BASE_URL='https://www.apier.no/__nonexistent_path__' node examples/altinn-migration.mjs; then
+            echo "REGRESSION: node example exited 0 on a known-404 URL — assertion is a no-op"
+            exit 1
+          else
+            echo "OK: node example correctly exited non-zero on known-404"
+          fi
+          # Python example must exit non-zero on a known-404 URL.
+          if APIER_BASE_URL='https://www.apier.no/__nonexistent_path__' python examples/altinn-migration.py; then
+            echo "REGRESSION: python example exited 0 on a known-404 URL — assertion is a no-op"
+            exit 1
+          else
+            echo "OK: python example correctly exited non-zero on known-404"
+          fi

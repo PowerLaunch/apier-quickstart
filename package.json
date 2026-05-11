@@ -1,0 +1,12 @@
+{
+  "name": "apier-quickstart",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Norwegian Altinn 2 → Altinn 3 migration in 10 lines.",
+  "license": "MIT",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "example": "node examples/altinn-migration.mjs"
+  }
+}
