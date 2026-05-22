@@ -26,6 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed "Once PR-083 ships" TODO — PR-083 shipped 2026-05-21,
   working `npx @apier-no/mcp` example now in place
 
+### Security
+- Examples reject non-HTTPS `APIER_BASE_URL` (allowing only `https://`
+  or `http://localhost`) to prevent accidental key exfiltration when
+  the env var is set to an untrusted host.
+
 ## [0.1.0] — 2026-05-11
 
 ### Added

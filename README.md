@@ -55,6 +55,8 @@ node examples/altinn-migration.mjs
 
 Default: `https://www.apier.no` (production).
 
+Only `https://` URLs (or `http://localhost` / `http://127.0.0.1` for local dev) are accepted — the examples reject other schemes so your key is never sent to an untrusted host.
+
 ## Try the MCP server (one-shot)
 
 Install + run the official Apier MCP server with one command:
