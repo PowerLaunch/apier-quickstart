@@ -1,9 +1,11 @@
-# Norwegian <!-- VERIFY VS NORWEGIAN: Altinn 2 -->Altinn 2 → <!-- VERIFY VS NORWEGIAN: Altinn 3 -->Altinn 3 migration, in 10 lines
+# Norwegian Altinn 2 → Altinn 3 migration, in 10 lines
 
-> **June 19, 2026 — Altinn 2 shuts down.** This quickstart hits
-> Apier's free, zero-auth Altinn 2 → Altinn 3 migration bridge so
-> you can ship the upgrade before the deadline. Node and Python
-> examples both run against production with no setup.
+> **The Altinn 2 shutdown deadline was June 19, 2026 — it has passed.**
+> If you still have integrations built against Altinn 2 service codes,
+> this quickstart hits Apier's free, zero-auth Altinn 2 → Altinn 3
+> migration bridge to map each legacy code to its Altinn 3 replacement,
+> with migration notes per service. Node and Python examples both run
+> against production with no setup.
 
 ## Get a key in 30 seconds
 
@@ -41,7 +43,7 @@ python examples/altinn-migration.py
 
 ## What it does
 
-Input is no parameter; output is the full migration map of <!-- VERIFY VS NORWEGIAN: Altinn 2 -->Altinn 2 service codes (e.g. `A0208`, `A0212`) and their <!-- VERIFY VS NORWEGIAN: Altinn 3 -->Altinn 3 replacements, with migration notes, verification flags, and the deadline in `days_remaining`. Filter to one entry with `?altinn2_code=A0208`.
+Input is no parameter; output is the full migration map of Altinn 2 service codes (e.g. `A0208`, `A0212`) and their Altinn 3 replacements, with migration notes, verification flags, and the cutover status (`deadline_passed`, plus `days_remaining` relative to the 2026-06-19 deadline). Filter to one entry with `?altinn2_code=A0208`.
 
 ## Self-hosted or staging
 
@@ -76,7 +78,7 @@ Full setup: https://apier.no/docs/mcp
 
 - Production integration: see https://apier.no/docs
 - Auth-gated endpoints (company context, deadlines, obligations) require an API key — sign up at https://apier.no
-- For OAuth2 server-to-server flows against Norwegian government, see <!-- VERIFY VS NORWEGIAN: Maskinporten -->Maskinporten guide at https://apier.no/docs (PR-089)
+- For OAuth2 server-to-server flows against Norwegian government, see the Maskinporten guide at https://apier.no/docs
 
 ## Security
 
