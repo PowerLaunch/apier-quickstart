@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+#
+# CodeRabbit cost gate (PR-COST-02, enforcing Rule 55).
+#
+# CodeRabbit is a PAID per-review reviewer; CI and the Claude Code Action are not.
+# `reviews.auto_review.enabled: false` below is the ENFORCEMENT mechanism for
+# "exactly one review per PR": CodeRabbit never fires unopted, so the Phase 2A
+# `@coderabbitai pause` comment can no longer lose a race against an auto-review
+# that fires the instant the PR opens. The single paid review is triggered
+# explicitly by Phase 2C's `@coderabbitai full review`, against a HEAD that CI and
+# Claude Code Review have already settled.
+reviews:
+  profile: chill
+  high_level_summary_placeholder: '@coderabbitai summary'
+  review_details: true
+  fail_commit_status: true
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  assess_linked_issues: false
+  related_issues: false
+  suggested_labels: false
+  suggested_reviewers: false
+  in_progress_fortune: false
+  poem: false
+  auto_review:
+    # OFF by design — see the header. Phase 2C opts in explicitly, once per PR.
+    enabled: false
+    auto_pause_after_reviewed_commits: 100
+    base_branches:
+      - ".*"
+  # Generated / machine-authored files only. Hand-written source is NEVER filtered
+  # out — in particular src/lib/supabase/migrations/** stays reviewable, because
+  # migrations are the surface Guard Rails 16-17 and Rule 45 exist to police and
+  # the one where the paid review earns the most.
+  path_filters:
+    - "!**/openapi.json"
+    - "!**/*.lock"
+    - "!package-lock.json"
+    - "!pnpm-lock.yaml"
+    - "!**/__snapshots__/**"
+  # All four scanners below already run as REQUIRED CI checks (Gitleaks, Semgrep
+  # Scan, and the npm-audit dependency gate). Paying CodeRabbit to re-run them
+  # buys duplicate findings on a diff the free gates have already cleared.
+  tools:
+    gitleaks:
+      enabled: false
+    semgrep:
+      enabled: false
+    checkov:
+      enabled: false
+    osv-scanner:
+      enabled: false
+    markdownlint:
+      enabled: false
+    languagetool:
+      enabled: false
+  finishing_touches:
+    docstrings:
+      enabled: false
+  pre_merge_checks:
+    docstrings:
+      mode: 'off'
+    title:
+      mode: 'off'
+    description:
+      mode: 'off'
+    issue_assessment:
+      mode: 'off'
+chat:
+  art: false
+  auto_reply: false
