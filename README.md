@@ -1,11 +1,9 @@
 # Norwegian Altinn 2 → Altinn 3 migration, in 10 lines
 
-> **The Altinn 2 shutdown deadline was June 19, 2026 — it has passed.**
-> If you still have integrations built against Altinn 2 service codes,
-> this quickstart hits Apier's free, zero-auth Altinn 2 → Altinn 3
-> migration bridge to map each legacy code to its Altinn 3 replacement,
-> with migration notes per service. Node and Python examples both run
-> against production with no setup.
+This quickstart calls Apier's free, zero-auth Altinn 2 → Altinn 3
+migration map: each legacy Altinn 2 service code with its Altinn 3
+replacement and migration notes. The Node and Python examples both run
+against production with no setup and no key.
 
 ## Try it now — no key needed
 
@@ -56,26 +54,33 @@ curl -sS 'https://www.apier.no/api/v1/sandbox/company/999660010/verify' \
 `Authorization` header across that host change — so authenticated calls should
 target `www.apier.no` directly.
 
-## Get a key in 30 seconds
+## Get a key
 
-The sandbox above is enough to explore. Sign up when you want the production
-test-mode surface.
+The sandbox above is enough to explore, and the migration map below needs
+no key at all. Sign up when you want real company data.
 
-1. Open https://apier.no/sign-up
-2. Verify your email → you'll see an API key starting with `apier_test_`
+1. Sign up at https://www.apier.no/sign-up. Sign-up sends a magic link to
+   your inbox and issues no key by itself.
+2. Open the link. On that first sign-in Apier creates your first key, a
+   free-tier key starting with `apr_free_`, and shows it once. Manage your
+   keys at https://www.apier.no/dashboard.
 3. Export it:
    ```bash
-   export APIER_TEST_KEY=apier_test_xxxxxxxxxxxx
+   export APIER_API_KEY=apr_free_<your_key_here>
    ```
-4. Run the example below.
+4. Send it as a bearer token, with `{org}` replaced by a real 9-digit
+   organisation number:
+   ```bash
+   curl -sS -H "Authorization: Bearer $APIER_API_KEY" \
+     'https://www.apier.no/api/v1/company/{org}/summary' | jq .
+   ```
 
-Two prefixes, two different things: `apier_test_` is the production test-mode
-key and requires signup, while `apier_sandbox_test_` is the self-generated
-keyless sandbox bearer used in the section above.
-
-Free tier: 100 calls / hour. No credit card. The Altinn 2 → Altinn 3
-migration bridge example below is zero-auth — you can run it without
-a key to see the shape, then bring your key for the rest.
+Two prefixes, two different things: a real API key is `apr_<tier>_…`
+(`apr_free_`, `apr_starter_`, `apr_pro_` or `apr_ent_`) and comes from
+sign-up, while `apier_sandbox_test_` is the self-generated keyless sandbox
+bearer used in the section above. No key of the older `apier_test_` /
+`apier_live_` shape was ever issued. The full key flow, including headless
+keys for agents, is at https://www.apier.no/docs/authentication.
 
 ## Run it
 
@@ -117,24 +122,27 @@ Only `https://` URLs (or `http://localhost` / `http://127.0.0.1` for local dev) 
 
 ## Try the MCP server (one-shot)
 
-Install + run the official Apier MCP server with one command:
+Run the official Apier MCP stdio proxy with one command. It reads
+`APIER_API_KEY` from your environment and sends it as
+`Authorization: Bearer …`:
 
 ```bash
-npx @apier-no/mcp@latest --header "X-Apier-Key: $APIER_TEST_KEY"
+APIER_API_KEY=apr_free_<your_key_here> npx -y @apier-no/mcp@latest
 ```
 
 The server speaks the [Model Context Protocol](https://modelcontextprotocol.io)
-and exposes Norwegian compliance tools (Brønnøysund, Maskinporten,
-Skatteetaten). Wire it into Claude Desktop, Cursor, or any MCP client
-via stdio.
+and serves Norwegian company data from open public registers such as
+Brønnøysund. Wire it into Claude Desktop, Cursor, or any MCP client via
+stdio. The current tool list is served by the keyless discovery endpoint
+`GET https://www.apier.no/api/mcp`.
 
-Full setup: https://apier.no/docs/mcp
+Full setup: https://www.apier.no/docs/mcp
 
 ## What's next
 
-- Production integration: see https://apier.no/docs
-- Auth-gated endpoints (company context, deadlines, obligations) require an API key — sign up at https://apier.no
-- For OAuth2 server-to-server flows against Norwegian government, see the Maskinporten guide at https://apier.no/docs
+- Production integration: see https://www.apier.no/docs
+- Auth-gated endpoints (company context, deadlines, obligations) require an API key: see "Get a key" above
+- Apier reads open public registers; it submits nothing to government and brokers no government access
 
 ## Security
 
